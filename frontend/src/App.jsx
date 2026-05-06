@@ -80,7 +80,7 @@ function App() {
   
     }
 
-
+    // ! Function to make the bot speak the response it gets from the backend using the speech synthesis api.
     function speak(text){ // get text from the sendMessage function and use it to make the bot talk
       window.speechSynthesis.cancel(); // * cancel any speech that is happening so this one can be heard as to not overlap.
 

@@ -8,6 +8,8 @@ from dotenv import load_dotenv
 from flask_cors import CORS
 
 # !---SETUP
+
+
 load_dotenv() # * load variables from .env file
 
 # * postgres setup
@@ -18,9 +20,16 @@ conn = psycopg2.connect(
     user=os.getenv("DB_USER"),
     password=os.getenv("DB_PASSWORD")
 )
+
+
 cursor = conn.cursor()
 
+
+
 # * create table if not exists for storing convo.
+
+
+
 cursor.execute('''CREATE TABLE IF NOT EXISTS memory (
     id SERIAL PRIMARY KEY,
     user_message TEXT NOT NULL,
@@ -30,15 +39,30 @@ conn.commit()
 cursor.close()
 conn.close()
 
+
+
+
 # * flask setup
+
+
 app = Flask(__name__) # * the app using it to create routes and stuff
 CORS(app)
 
+
+
 # * mistral setup
+
+
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY") # * mistral key from .env
 client = Mistral(api_key=MISTRAL_API_KEY)
 
+
+
+
 # ! --- HELPER FUNCTIONS
+
+
+
 # ! Helper function to simplify the connection and cursor definition
 def getDB():
     conn = psycopg2.connect(
@@ -49,6 +73,8 @@ def getDB():
         password=os.getenv("DB_PASSWORD")
     )
     return conn, conn.cursor()
+
+
 
 # ! context helper function
 def getContext():
@@ -66,6 +92,8 @@ def getContext():
     cursor.close()
     conn.close()
     return context
+
+
 
 # ! Conversation Helper function
 def conversation(context, userMessage):
@@ -87,6 +115,8 @@ def conversation(context, userMessage):
     )
     return response.choices[0].message.content # * choices[0] is the first response, message.content is the content of the response
 
+
+
 # ! Emotions Helper Function
 def getEmotions(userMessage):
     prompt = f"in one word what does this ({userMessage}) make you feel? your options are: happy, sad, angry, neutral, excited, scared, confused, frustrated, and surprised"
@@ -95,6 +125,8 @@ def getEmotions(userMessage):
         messages=[{"role": "user", "content": prompt}],
     )
     return response.choices[0].message.content
+
+
 
 # ! store in db Helper function
 def storeInDb(userMessage, botResponse):
@@ -111,11 +143,31 @@ def storeInDb(userMessage, botResponse):
     cursor.close()
     conn.close()
 
+
+    # ! generate response Helper function
+def generate_response(userMessage): # * get all serves to get the answer and the emotion
+    context = getContext()
+    answer = conversation(context, userMessage)
+    emotion = getEmotions(userMessage)
+    storeInDb(userMessage, answer) # * store the convo in the database.
+    return jsonify({
+        "answer": answer,
+        "emotion": emotion
+    })
+
+
+
 # !--- FLASK APP
+
+
+
 # ! home route
 @app.route("/")
 def home():
     return "Hello, this is the backend for the chatbot application!"
+
+
+
 
 # ! chat route
 @app.route('/chat', methods=['POST'])
@@ -128,17 +180,8 @@ def chatEndpoint(): # * chat endpoint serves to get the message from the user
     result = generate_response(user_message) # * get the result from the getAll function
     return result
 
-# ! generate response function
-def generate_response(userMessage): # * get all serves to get the answer and the emotion
-    context = getContext()
-    answer = conversation(context, userMessage)
-    emotion = getEmotions(userMessage)
-    storeInDb(userMessage, answer) # * store the convo in the database.
-    return jsonify({
-        "answer": answer,
-        "emotion": emotion
-    })
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=int(os.getenv("FLASK_PORT", 5001)), host='0.0.0.0')
-

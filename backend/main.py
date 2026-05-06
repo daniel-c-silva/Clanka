@@ -21,7 +21,7 @@ conn = psycopg2.connect(
     port="5432",
     database="postgres",
     user="postgres",
-    password="1206" 
+    password=
 )
 
 cursor = conn.cursor()
@@ -58,7 +58,7 @@ CORS(app)
 
 
 
-MISTRAL_API_KEY = "nPZp0MUUGDbsIzlqsoLgrYzuPXZ1BKdO" # * mistral key
+MISTRAL_API_KEY =  # * mistral key
 
 client = Mistral(api_key=MISTRAL_API_KEY)
 
@@ -82,7 +82,7 @@ def getDB():
     port="5432",
     database="postgres",
     user="postgres",
-    password="1206" 
+    password= 
 )
    return conn, conn.cursor()
 

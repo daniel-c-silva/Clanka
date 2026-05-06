@@ -1,0 +1,54 @@
+/* Centering the app */
+body {
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #1a1a1a;
+  color: white;
+  font-family: sans-serif;
+}
+
+.Input {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #2a2a2a;
+  color: white;
+  width: 250px;
+  margin-right: 10px;
+  outline: none;
+}
+
+.Input:focus {
+  border-color: #646cff;
+}
+
+button {
+  padding: 12px 20px;
+  border-radius: 8px;
+  border: none;
+  background-color: #646cff;
+  color: white;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background-color: #535bf2;
+}
+
+.response-container {
+  margin-top: 30px;
+  padding: 20px;
+  background: #252525;
+  border-radius: 12px;
+  border: 1px solid #333;
+  width: 300px;
+}
+
+strong {
+  color: #646cff;
+}

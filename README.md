@@ -32,8 +32,10 @@ Calculations were performed to ensure motors could withstand the load.
 ## Tech Stack
 
 ```
-* **Microcontroller:** Arduino Uno (C++)
-* **SBC:** Raspberry Pi 4/5 (Python Backend)
+* **Microcontroller:** Arduino Nano (C++) — may migrate to Uno
+* **SBC:** Raspberry Pi 3B (Python Backend)
+* **Frontend** Vite + React
+* **Backend** Flask + PostgresSQL
 * **Motor Control:** 2x NEMA 17 Stepper Motors + A4988 Drivers
 * **Communication:** Serial/USB Bridge
 ```
@@ -41,19 +43,46 @@ Calculations were performed to ensure motors could withstand the load.
 
 # Run
 
-## Navigate to the backend directory
-```
-cd backend
-```
-
-# Install dependencies (pyserial, flask, etc.)
+## Install dependencies
 ```
 pip install -r requirements.txt
 ```
 
-# Start the Clanka Brain
+## Mistral API key
 ```
-python3 main.py (still pending the brain lol)
+Go to console.mistral.ai
+Sign up or log in
+Go to API Keys in the sidebar
+Click Create new key, give it a name
+Copy it — cuz you won't see it again
+Paste it in your .env file:
 ```
+
+## PostgresSQL set up
+```
+# macOS
+brew install postgresql
+
+# Ubuntu/Linux
+sudo apt install postgresql
+
+# Windows — download installer from postgresql.org
+
+```
+
+## backend (Brains)
+```
+cd backend
+python3 main.py
+```
+
+## frontend (Visual)
+```
+cd frontend
+npm run dev
+```
+
+
+
 
 

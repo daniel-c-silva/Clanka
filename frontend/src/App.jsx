@@ -1,5 +1,4 @@
-
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import './App.css';
 
 function App() {
@@ -8,8 +7,7 @@ function App() {
     const [response, setResponse] = useState({ answer: '', emotion: '' });
     const [isListening, setIsListening] = useState(false); // * start it as false because we are not listening by default.
     const [transcript, setTranscript] = useState(''); // * this is the text that we are going to get from the  speech recogintion.
-  
-
+      
 
 
 
@@ -54,45 +52,6 @@ function App() {
     }
 
 
-        // ! useEffect to start the wake word listner
-    useEffect(() => {
-    function toggleAwake() {
-      const wakeRecognizer = new window.webkitSpeechRecognition(); // * speech api to listen for the wake word
-      wakeRecognizer.lang = 'en-US'; // * set the language to american english (standard)
-      wakeRecognizer.continuous = true; // ! keep listening until we get the wake word.
-      wakeRecognizer.interimResults = false; // * only final result matters
-
-      wakeRecognizer.onresult = (event) => {
-
-        const heardText = event.results[event.results.length - 1][0].transcript.toLowerCase();
-
-
-        // * if we heard the wake up word
-        if (heardText.includes('wake up')){
-         
-          wakeRecognizer.stop(); // * stop listening for the wake word once we got it
-
-          startListening(); // ! start the main listening function to listen to the user and get the response from the bot.
-
-        };
-      };
- 
-
-        // ? in case we stop start again
-        wakeRecognizer.onend = () => {
-          wakeRecognizer.start(); // * restart the wake word listener if it stops for any reason, to ensure the bot is always listening for the wake word.
-        };
-
-        wakeRecognizer.start(); // * start listening for the wake word when the app loads.
-
-      
-    }
-
-    toggleAwake(); // * start the wake word listener when the app loads.
-  }, []);
-
-  
-
 
     // ! Commnication Function  to send the message that it gets from the function startListening to the backend and get the response from mistral ai
     function sendMessage(message) {
@@ -121,9 +80,7 @@ function App() {
   
     }
 
- 
-
-    // ! Speaking Function to make the bot talk using the speech synthesis api using the text we get from send messae
+   // ! speaking function to make bot talk using the speech synthesis api , it takes text as an argument from the sendmessage function
     function speak(text){ // get text from the sendMessage function and use it to make the bot talk
       window.speechSynthesis.cancel(); // * cancel any speech that is happening so this one can be heard as to not overlap.
 
@@ -178,7 +135,7 @@ function App() {
 
 
     
-  
+
 
 
 

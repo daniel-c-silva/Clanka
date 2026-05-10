@@ -11,51 +11,6 @@ function App() {
   
 
 
-    // ! useEffect to start the wake word listner
-    useEffect(() => {
-    function toggleAwake() {
-      const wakeRecognizer = new window.webkitSpeechRecognition(); // * speech api to listen for the wake word
-      wakeRecognizer.lang = 'en-US'; // * set the language to american english (standard)
-      wakeRecognizer.continuous = true; // ! keep listening until we get the wake word.
-      wakeRecognizer.interimResults = false; // * only final result matters
-
-      wakeRecognizer.onresult = (event) => {
-
-        const heardText = event.results[event.results.length - 1][0].transcript.toLowerCase();
-
-
-        // * if we heard the wake up word
-        if (heardText.includes('wake up')){
-         
-          wakeRecognizer.stop(); // * stop listening for the wake word once we got it
-
-          startListening(); // ! start the main listening function to listen to the user and get the response from the bot.
-
-        };
-      };
- 
-
-        // ? in case we stop start again
-        wakeRecognizer.onend = () => {
-          wakeRecognizer.start(); // * restart the wake word listener if it stops for any reason, to ensure the bot is always listening for the wake word.
-        };
-
-        wakeRecognizer.start(); // * start listening for the wake word when the app loads.
-
-      
-    }
-
-    toggleAwake(); // * start the wake word listener when the app loads.
-  }, []);
-
-  
-
-
-
-
-
-
-
 
 
 
@@ -98,6 +53,45 @@ function App() {
       };
     }
 
+
+        // ! useEffect to start the wake word listner
+    useEffect(() => {
+    function toggleAwake() {
+      const wakeRecognizer = new window.webkitSpeechRecognition(); // * speech api to listen for the wake word
+      wakeRecognizer.lang = 'en-US'; // * set the language to american english (standard)
+      wakeRecognizer.continuous = true; // ! keep listening until we get the wake word.
+      wakeRecognizer.interimResults = false; // * only final result matters
+
+      wakeRecognizer.onresult = (event) => {
+
+        const heardText = event.results[event.results.length - 1][0].transcript.toLowerCase();
+
+
+        // * if we heard the wake up word
+        if (heardText.includes('wake up')){
+         
+          wakeRecognizer.stop(); // * stop listening for the wake word once we got it
+
+          startListening(); // ! start the main listening function to listen to the user and get the response from the bot.
+
+        };
+      };
+ 
+
+        // ? in case we stop start again
+        wakeRecognizer.onend = () => {
+          wakeRecognizer.start(); // * restart the wake word listener if it stops for any reason, to ensure the bot is always listening for the wake word.
+        };
+
+        wakeRecognizer.start(); // * start listening for the wake word when the app loads.
+
+      
+    }
+
+    toggleAwake(); // * start the wake word listener when the app loads.
+  }, []);
+
+  
 
 
     // ! Commnication Function  to send the message that it gets from the function startListening to the backend and get the response from mistral ai

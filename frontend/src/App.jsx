@@ -113,10 +113,9 @@ function App() {
 
         // ? IF the robotvoice actually exists
         if (robotVoice) statement.voice = robotVoice;
-        setTimeout(() => { // ? add a small delay to ensure the voice is set before speaking.
+          
         // * fire the statement.
         window.speechSynthesis.speak(statement)  // * use the statement configurations to actually create the sound
-        }, ); //? add a small delay to ensure the voice is set before speaking.
       };
 
 

@@ -1,4 +1,6 @@
-from flask import Flask, request, jsonify
+
+# !---SETUP
+from flask import Flask, request, jsonify, send_from_directory
 import flask
 from mistralai.client import Mistral
 from flask_cors import CORS
@@ -149,10 +151,10 @@ def generate_response(userMessage): # * get all serves to get the answer and the
 
 
 
-# ! home route
-@app.route("/")
-def home():
-    return "Hello, this is the backend for the chatbot application!"
+# ! CHANGED for kiosk mode 
+# @app.route("/")
+#def home():
+ #   return "Hello, this is the backend for the chatbot application!"
 
 
 
@@ -168,6 +170,15 @@ def chatEndpoint(): # * chat endpoint serves to get the message from the user
     result = generate_response(user_message) # * get the result from the getAll function
     return result
 
+
+# ! MAKE DEFAULT ROUTE SO IT RUNS FRONTEND AND BACKEND AT THE SAME TIME
+
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_frontend(path):
+    if path and os.path.exists(os.path.join('dist', path)):
+        return send_from_directory('dist', path)
+    return send_from_directory('dist', 'index.html')
 
 
 

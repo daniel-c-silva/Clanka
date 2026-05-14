@@ -13,13 +13,7 @@ from flask_cors import CORS
 load_dotenv() # * load variables from .env file
 
 # * postgres setup
-conn = psycopg2.connect(
-    host=os.getenv("DB_HOST"),
-    port=os.getenv("DB_PORT"),
-    database=os.getenv("DB_NAME"),
-    user=os.getenv("DB_USER"),
-    password=os.getenv("DB_PASSWORD")
-)
+conn = psycopg2.connect(os.getenv("DATABASE_URL"))
 
 
 cursor = conn.cursor()
@@ -32,6 +26,7 @@ cursor = conn.cursor()
 
 cursor.execute('''CREATE TABLE IF NOT EXISTS memory (
     id SERIAL PRIMARY KEY,
+    session_id TEXT NOT NULL, 
     user_message TEXT NOT NULL,
     bot_response TEXT NOT NULL
 )''')
@@ -65,25 +60,20 @@ client = Mistral(api_key=MISTRAL_API_KEY)
 
 # ! Helper function to simplify the connection and cursor definition
 def getDB():
-    conn = psycopg2.connect(
-        host=os.getenv("DB_HOST"),
-        port=os.getenv("DB_PORT"),
-        database=os.getenv("DB_NAME"),
-        user=os.getenv("DB_USER"),
-        password=os.getenv("DB_PASSWORD")
-    )
+    conn = psycopg2.connect(os.getenv("DATABASE_URL"))
     return conn, conn.cursor()
 
 
 
 # ! context helper function
-def getContext():
+def getContext(session_id):
     # * we are going to take the last 5 user messages and the last 5 bot replies from the database
     conn, cursor = getDB()
     cursor.execute('''SELECT user_message, bot_response
     FROM memory
+    WHERE session_id = %s
     ORDER BY id DESC
-    LIMIT 5''')
+    LIMIT 5''', (session_id,)) # * get the last 5 messages for the session id
     rows = cursor.fetchall() # * fetch all rows
     context = ""
     for row in rows:
@@ -129,27 +119,29 @@ def getEmotions(userMessage):
 
 
 # ! store in db Helper function
-def storeInDb(userMessage, botResponse):
+def storeInDb(userMessage, botResponse, session_id):
     conn, cursor = getDB() # * get the connection and cursor
-    cursor.execute('''INSERT INTO memory (user_message, bot_response)
-    VALUES (%s, %s)''', (userMessage, botResponse))
+    cursor.execute('''INSERT INTO memory (user_message, bot_response, session_id)
+    VALUES (%s, %s, %s)''', (userMessage, botResponse, session_id))
     # * added to keep the last 5 messages in the db
     # * delete everything except the last 5 rows for memory management.
     cursor.execute('''DELETE FROM memory
-    WHERE id NOT IN (SELECT id FROM memory
+    WHERE session_id = %s
+    AND id NOT IN (SELECT id FROM memory
+    WHERE session_id = %s
     ORDER BY id DESC
-    LIMIT 5)''')
+    LIMIT 5)''', (session_id, session_id))
     conn.commit()
     cursor.close()
     conn.close()
 
 
     # ! generate response Helper function
-def generate_response(userMessage): # * get all serves to get the answer and the emotion
-    context = getContext()
+def generate_response(userMessage, session_id): # * get all serves to get the answer and the emotion
+    context = getContext(session_id) # * get the context for the session id 
     answer = conversation(context, userMessage)
     emotion = getEmotions(userMessage)
-    storeInDb(userMessage, answer) # * store the convo in the database.
+    storeInDb(userMessage, answer, session_id) # * store the convo in the database.
     return jsonify({
         "answer": answer,
         "emotion": emotion
@@ -175,9 +167,10 @@ def home():
 def chatEndpoint(): # * chat endpoint serves to get the message from the user
     data = request.json # * get the data from the request. the userMessage basically
     user_message = data.get("message") # * get the message from the data
+    session_id = data.get("session_id") # * get the session id from the data
     if not user_message: # ? if the message is not found
         return jsonify({"error": "User message was not found"})
-    result = generate_response(user_message) # * get the result from the getAll function
+    result = generate_response(user_message, session_id) # * get the result from the getAll function
     return result
 
 

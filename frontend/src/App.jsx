@@ -55,7 +55,7 @@ function App() {
 
     // ! Commnication Function  to send the message that it gets from the function startListening to the backend and get the response from mistral ai
     function sendMessage(message) {
-      fetch('https://clanka-ekde.onrender.com', {
+      fetch('https://clanka-ekde.onrender.com/chat', {
 
         method: 'POST',
         headers: {

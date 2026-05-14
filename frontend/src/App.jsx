@@ -61,7 +61,7 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message }), // * send the message as a json object to the backend.
+        body: JSON.stringify({ message, session_id: generateSessionID() }), // * send the message as a json object to the backend. AND send the session id so the backend can identify the user in the data base
       })
 
         .then(response => response.json())
@@ -113,9 +113,10 @@ function App() {
 
         // ? IF the robotvoice actually exists
         if (robotVoice) statement.voice = robotVoice;
-          
+        setTimeout(() => { // ? add a small delay to ensure the voice is set before speaking.
         // * fire the statement.
         window.speechSynthesis.speak(statement)  // * use the statement configurations to actually create the sound
+        }, ); //? add a small delay to ensure the voice is set before speaking.
       };
 
 
@@ -132,6 +133,18 @@ function App() {
 
     }
 
+    function generateSessionID() {
+
+      let id = localStorage.getItem('sessionID'); // * try to get the session id from local storage in case the user HAS already talked to the bot before
+
+      if (!id) {
+        id = crypto.randomUUID(); // * if there is no session id in local storage generate a new one using the crypto api from the browser.
+        localStorage.setItem('sessionID', id); // * save the id to local storage
+      }
+
+      return id; // * return the id so it can be used in the backend to identify the user
+
+    }
 
     
 

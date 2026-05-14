@@ -40,6 +40,12 @@ Calculations were performed to ensure motors could withstand the load.
 * **Communication:** Serial/USB Bridge
 ```
 
+## Live demo
+
+[https://clanka-eight.vercel.app](https://clanka-eight.vercel.app)
+
+a bit slow sometimes on start but once it runs it runs
+
 
 # Run
 

@@ -29,6 +29,23 @@ Refer to the blueprint below for pin mapping between the Raspberry Pi, Arduino U
 Calculations were performed to ensure motors could withstand the load.
 ![Torque Calculations](assets/calcs/TorqueCalcs.JPG)
 
+## Software
+
+### Flux Diagrams
+
+### Backend
+![Backend-Flux Diagram](assets/flux-diagrams/BackendDiagram.png)
+
+### Frontend
+![Frontend-Flux Diagram](assets/flux-diagrams/FrontendDiagram.png)
+
+
+## Live demo
+
+[https://clanka-eight.vercel.app](https://clanka-eight.vercel.app)
+
+a bit slow sometimes on start but once it runs it runs
+
 ## Tech Stack
 
 ```
@@ -39,12 +56,6 @@ Calculations were performed to ensure motors could withstand the load.
 * **Motor Control:** 2x NEMA 17 Stepper Motors + A4988 Drivers
 * **Communication:** Serial/USB Bridge
 ```
-
-## Live demo
-
-[https://clanka-eight.vercel.app](https://clanka-eight.vercel.app)
-
-a bit slow sometimes on start but once it runs it runs
 
 
 # Run

@@ -7,6 +7,8 @@ function App() {
     const [response, setResponse] = useState({ answer: '', emotion: '' });
     const [isListening, setIsListening] = useState(false); // * start it as false because we are not listening by default.
     const [transcript, setTranscript] = useState(''); // * this is the text that we are going to get from the  speech recogintion.
+
+    const [isConnecting, setIsConnecting] = useState(false); // * this state is to handle the connection state to the server on render.
       
 
 
@@ -55,6 +57,8 @@ function App() {
 
     // ! Commnication Function  to send the message that it gets from the function startListening to the backend and get the response from mistral ai
     function sendMessage(message) {
+      setIsConnecting(true); // * set connecting to true.
+
       fetch('https://clanka-ekde.onrender.com/chat', {
 
         method: 'POST',
@@ -66,7 +70,9 @@ function App() {
 
         .then(response => response.json())
         .then(data => {
+            setIsConnecting(false); // * set connecting to false after we get the backend response.
             console.log('data:', data); // ? log data into the console
+
             setResponse({ answer: data.answer, emotion: data.emotion}); // * set the response state to the answer and emotion we get from the mistral ai in the backend.
 
             speak(data.answer); // * actually speak the response
@@ -156,13 +162,16 @@ function App() {
 return (
     <div className='container'>
 
+            
+
         <div className='bot-section'>
             <p className='emotion'>Emotion: {response.emotion}</p>
             <p className='answer'>Answer: {response.answer}</p>
         </div>
 
         <div className='input-section'>
-            <p className='transcript'>{transcript ? `You said: ${transcript}` : ''}</p>
+            <p className='transcript'>{transcript ? `You said: ${transcript}` : ''}</p> // if there is a transcript show it, if not do nothing.
+            <p className='status'>{isConnecting ? 'Connecting to the server...': ''}</p> // if we are connecting to the sv show this, if not nothing
             <button className='talk-button' onClick={startListening} disabled={isListening}>
                 {isListening ? 'Listening...' : 'Talk to Clanka'}
             </button>

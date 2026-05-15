@@ -46,6 +46,8 @@ Calculations were performed to ensure motors could withstand the load.
 
 a bit slow sometimes on start but once it runs it runs
 
+# *******(to be fixed soon)
+
 ## Tech Stack
 
 ```

@@ -4,7 +4,7 @@ from mistralai.client import Mistral
 from flask_cors import CORS
 import psycopg2 # * import postgres sql
 import os
-from dotenv import load_dotenv
+from dotenv import load_dotenv  
 
 # !---SETUP
 
@@ -21,7 +21,7 @@ cursor = conn.cursor()
 
 # * create table if not exists for storing convo.
 
-
+ 
 
 cursor.execute('''CREATE TABLE IF NOT EXISTS memory (
     id SERIAL PRIMARY KEY,
@@ -107,8 +107,8 @@ def conversation(context, userMessage):
 
 
 # ! Emotions Helper Function
-def getEmotions(userMessage):
-    prompt = f"in one word what does this ({userMessage}) make you feel? your options are: happy, sad, angry, neutral, excited, scared, confused, frustrated, and surprised"
+def getEmotions(answer):
+    prompt = f"in one word what does this ({answer}) make you feel? you said this what emotion combines with it? your options are: happy, sad, angry, neutral, excited, scared, confused, frustrated, and surprised"
     response = client.chat.complete(
         model="mistral-tiny", # * cheaper and faster model, enough for emotion detection
         messages=[{"role": "user", "content": prompt}],
@@ -139,7 +139,7 @@ def storeInDb(userMessage, botResponse, session_id):
 def generate_response(userMessage, session_id): # * get all serves to get the answer and the emotion
     context = getContext(session_id) # * get the context for the session id 
     answer = conversation(context, userMessage)
-    emotion = getEmotions(userMessage)
+    emotion = getEmotions(answer)
     storeInDb(userMessage, answer, session_id) # * store the convo in the database.
     return jsonify({
         "answer": answer,

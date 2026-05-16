@@ -170,8 +170,8 @@ return (
         </div>
 
         <div className='input-section'>
-            <p className='transcript'>{transcript ? `You said: ${transcript}` : ''}</p> // if there is a transcript show it, if not do nothing.
-            <p className='status'>{isConnecting ? 'Connecting to the server...': ''}</p> // if we are connecting to the sv show this, if not nothing
+            <p className='transcript'>{transcript ? `You said: ${transcript}` : ''}</p> { /* if there is a transcript show it, if not do nothing. */}
+            <p className='status'>{isConnecting ? 'Connecting to the server...': ''}</p> { /* if we are connecting to the sv show this, if not nothing */ }
             <button className='talk-button' onClick={startListening} disabled={isListening}>
                 {isListening ? 'Listening...' : 'Talk to Clanka'}
             </button>

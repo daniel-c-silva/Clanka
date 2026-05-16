@@ -5,7 +5,6 @@ from flask_cors import CORS
 import psycopg2 # * import postgres sql
 import os
 from dotenv import load_dotenv
-from flask_cors import CORS
 
 # !---SETUP
 

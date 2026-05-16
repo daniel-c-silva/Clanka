@@ -111,7 +111,7 @@ function App() {
 
         const voices = window.speechSynthesis.getVoices(); // * get all the voices that the browser has.
         const robotVoice = voices.find( voice =>
-          voice.name.includes('Google UK English Female') || // * get the specific voice.
+          voice.name.includes('Google português do Brasil') || // * get the specific voice.
 
           voice.name.includes('Alex') ||// ? macOS fallback
 

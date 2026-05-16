@@ -101,8 +101,8 @@ function App() {
 
       // * configure the object -statement
       statement.lang = 'pt-PT'; // * set the language to european portuguese // * set the language to american english, ONCE AGAIN not my preference
-      statement.pitch = 1.5; // * set the pitch to 2 to make it sound cute ig
-      statement.rate = 1.15; // * set the rate to 1.15 to make it sound a bit faster and more lively.
+      statement.pitch = 1; // * set the pitch to 2 to make it sound cute ig
+      statement.rate = 1.1; // * set the rate to 1.15 to make it sound a bit faster and more lively.
       statement.volume = 1; // * base volume
 
       // * Voice Loading 

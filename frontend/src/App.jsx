@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import './App.css';
 
 function App() {
@@ -9,6 +9,8 @@ function App() {
     const [transcript, setTranscript] = useState(''); // * this is the text that we are going to get from the  speech recogintion.
 
     const [isConnecting, setIsConnecting] = useState(false); // * this state is to handle the connection state to the server on render.
+
+    const recognizeVoice = useRef(null); // * store the recognition instance so we can stop and start it from anywhere.
       
 
 
@@ -18,16 +20,16 @@ function App() {
     function startListening() {
 
 
-      const recognizeVoice = new window.webkitSpeechRecognition(); // * this is the speech rec api that we are going to use. built in to the browser (edge and chrome only).
+      recognizeVoice.current = new window.webkitSpeechRecognition(); // * this is the speech rec api that we are going to use. built in to the browser (edge and chrome only).
 
-      recognizeVoice.lang = 'en-US'; // * by default to american english, though that's not my preference it is standard.
-      recognizeVoice.interimResults = false; // * this means that we only want the final resault from the phrase not the process of it being spoken.
+      recognizeVoice.current.lang = 'en-US'; // * by default to american english, though that's not my preference it is standard.
+      recognizeVoice.current.interimResults = false; // * this means that we only want the final resault from the phrase not the process of it being spoken.
 
       setIsListening(true); // * turn listening on.
 
-      recognizeVoice.start(); // * start speech recognition.
+      recognizeVoice.current.start(); // * start speech recognition.
 
-      recognizeVoice.onresult = (event) => {
+      recognizeVoice.current.onresult = (event) => {
 
         const spokenText = event.results[0][0].transcript; // * this is the text we are going get from the recognition, 0 and 0 because we take the first result and first alternetive.
         setTranscript(spokenText); // * set the transcript to what we just got from the recognition.
@@ -38,7 +40,7 @@ function App() {
 
 
       // ? Error Handling...
-      recognizeVoice.onerror = (event) => {
+      recognizeVoice.current.onerror = (event) => {
 
         console.error('could not recognize audio:', event.error); // * log error message.
         setIsListening(false);
@@ -47,7 +49,7 @@ function App() {
 
 
       // * when user stops speakingm stop listening and reset the state.
-      recognizeVoice.onend = () => {
+      recognizeVoice.current.onend = () => {
 
         setIsListening(false); 
       };
@@ -90,7 +92,7 @@ function App() {
     function speak(text){ // get text from the sendMessage function and use it to make the bot talk
       window.speechSynthesis.cancel(); // * cancel any speech that is happening so this one can be heard as to not overlap.
 
-
+      recognizeVoice.current.stop(); // * stop listening while clanka speaks so he doesn't hear himself.
       
       // * create the speaking object -statement
       const statement = new window.SpeechSynthesisUtterance(text); // * this is the speech synthesis api that we are going to use to make our bot talk, it is also built in to the browser (edge and chrome only.)
@@ -121,10 +123,14 @@ function App() {
         if (robotVoice) statement.voice = robotVoice;
         setTimeout(() => { // ? add a small delay to ensure the voice is set before speaking.
         // * fire the statement.
-        window.speechSynthesis.speak(statement)  // * use the statement configurations to actually create the sound
+        window.speechSynthesis.speak(statement);  // * use the statement configurations to actually create the sound
         }, ); //? add a small delay to ensure the voice is set before speaking.
       };
 
+      // * restart listening after clanka finishes speaking so the user can talk again.
+      statement.onend = () => {
+        startListening();
+      };
 
       // ? TO SPEED THINGS UP
 
@@ -153,11 +159,6 @@ function App() {
     }
 
     
-
-
-
-
-
 
 return (
     <div className='container'>

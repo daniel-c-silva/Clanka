@@ -29,6 +29,8 @@ function App() {
 
       recognizeVoice.current.start(); // * start speech recognition.
 
+      // difference between start speech recoginition and start listening is that speechrec is the actual api function whereas start listening is our our state function that turns on the listening.
+
       recognizeVoice.current.onresult = (event) => {
 
         const spokenText = event.results[0][0].transcript; // * this is the text we are going get from the recognition, 0 and 0 because we take the first result and first alternetive.
@@ -92,7 +94,7 @@ function App() {
     function speak(text){ // get text from the sendMessage function and use it to make the bot talk
       window.speechSynthesis.cancel(); // * cancel any speech that is happening so this one can be heard as to not overlap.
 
-      recognizeVoice.current.stop(); // * stop listening while clanka speaks so he doesn't hear himself.
+      recognizeVoice.current.stop(); // * stop listening while clanka speaks so he doesn't hear himself and get answers himself by accident.
       
       // * create the speaking object -statement
       const statement = new window.SpeechSynthesisUtterance(text); // * this is the speech synthesis api that we are going to use to make our bot talk, it is also built in to the browser (edge and chrome only.)
@@ -127,10 +129,12 @@ function App() {
         }, ); //? add a small delay to ensure the voice is set before speaking.
       };
 
-      // * restart listening after clanka finishes speaking so the user can talk again.
+      // * once the phrase is done being spoken start listening again so we can continue the convo
       statement.onend = () => {
-        startListening();
+        startListening(); 
       };
+
+      
 
       // ? TO SPEED THINGS UP
 

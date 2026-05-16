@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import './App.css';
 
 function App() {
@@ -10,7 +10,7 @@ function App() {
 
     const [isConnecting, setIsConnecting] = useState(false); // * this state is to handle the connection state to the server on render.
       
-    let silenceTimer = null;
+    const silenceTimer = useRef(null);
 
    
 
@@ -33,10 +33,9 @@ function App() {
 
         const spokenText = event.results[event.results.length - 1][0].transcript; // * this is the text we are going get from the recognition, 0 and 0 because we take the first result and first alternetive.
         setTranscript(spokenText); // * set the transcript to what we just got from the recognition.
-        setIsListening(false); // * turn listening off after we get the result.
-         clearTimeout(silenceTimer);
-         silenceTimer = setTimeout(() => {
-         sendMessage(spokenText);
+        clearTimeout(silenceTimer.current);
+        silenceTimer.current = setTimeout(() => {
+        sendMessage(spokenText);
       }, 800);
       };
       

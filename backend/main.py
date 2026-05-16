@@ -107,8 +107,8 @@ def conversation(context, userMessage):
 
 
 # ! Emotions Helper Function
-def getEmotions(answer):
-    prompt = f"in one word what does this ({answer}) make you feel? you said this what emotion combines with it? your options are: happy, sad, angry, neutral, excited, scared, confused, frustrated, and surprised"
+def getEmotions(userMessage):
+    prompt = f"You are Clanka, a friendly and playful AI robot. A user just said this to you: '{userMessage}'. In ONE word only, what emotion does this make you feel? Choose strictly from: happy, sad, angry, neutral, excited, scared, confused, frustrated, surprised. Reply with just the one word, nothing else."
     response = client.chat.complete(
         model="mistral-tiny", # * cheaper and faster model, enough for emotion detection
         messages=[{"role": "user", "content": prompt}],
@@ -139,7 +139,7 @@ def storeInDb(userMessage, botResponse, session_id):
 def generate_response(userMessage, session_id): # * get all serves to get the answer and the emotion
     context = getContext(session_id) # * get the context for the session id 
     answer = conversation(context, userMessage)
-    emotion = getEmotions(answer)
+    emotion = getEmotions(userMessage)
     storeInDb(userMessage, answer, session_id) # * store the convo in the database.
     return jsonify({
         "answer": answer,

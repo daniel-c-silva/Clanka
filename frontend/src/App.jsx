@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import './App.css';
 
 function App() {
@@ -10,9 +10,9 @@ function App() {
 
     const [isConnecting, setIsConnecting] = useState(false); // * this state is to handle the connection state to the server on render.
       
-    const silenceTimer = useRef(null);
 
-   
+
+
 
     // ! Function to listen to the user and transform it into text.
     function startListening() {
@@ -23,20 +23,16 @@ function App() {
       recognizeVoice.lang = 'en-US'; // * by default to american english, though that's not my preference it is standard.
       recognizeVoice.interimResults = false; // * this means that we only want the final resault from the phrase not the process of it being spoken.
 
-      recognizeVoice.continuous = true; // recognition will continue.
-
       setIsListening(true); // * turn listening on.
 
       recognizeVoice.start(); // * start speech recognition.
 
       recognizeVoice.onresult = (event) => {
 
-        const spokenText = event.results[event.results.length - 1][0].transcript; // * this is the text we are going get from the recognition, 0 and 0 because we take the first result and first alternetive.
+        const spokenText = event.results[0][0].transcript; // * this is the text we are going get from the recognition, 0 and 0 because we take the first result and first alternetive.
         setTranscript(spokenText); // * set the transcript to what we just got from the recognition.
-        clearTimeout(silenceTimer.current);
-        silenceTimer.current = setTimeout(() => {
-        sendMessage(spokenText);
-      }, 800);
+        setIsListening(false); // * turn listening off after we get the result.
+        sendMessage(spokenText); // * send the spoken text to the backend to get the ai response.
       };
       
 

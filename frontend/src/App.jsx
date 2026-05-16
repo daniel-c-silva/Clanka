@@ -22,7 +22,7 @@ function App() {
 
       recognizeVoice.current = new window.webkitSpeechRecognition(); // * this is the speech rec api that we are going to use. built in to the browser (edge and chrome only).
 
-      recognizeVoice.current.lang = 'en-US'; // * by default to american english, though that's not my preference it is standard.
+      recognizeVoice.current.lang = 'pt-PT'; // * by default to european portuguese // * by default to american english, though that's not my preference it is standard.
       recognizeVoice.current.interimResults = false; // * this means that we only want the final resault from the phrase not the process of it being spoken.
 
       setIsListening(true); // * turn listening on.
@@ -100,7 +100,7 @@ function App() {
       const statement = new window.SpeechSynthesisUtterance(text); // * this is the speech synthesis api that we are going to use to make our bot talk, it is also built in to the browser (edge and chrome only.)
 
       // * configure the object -statement
-      statement.lang = 'en-US'; // * set the language to american english, ONCE AGAIN not my preference
+      statement.lang = 'pt-PT'; // * set the language to european portuguese // * set the language to american english, ONCE AGAIN not my preference
       statement.pitch = 1.5; // * set the pitch to 2 to make it sound cute ig
       statement.rate = 1.15; // * set the rate to 1.15 to make it sound a bit faster and more lively.
       statement.volume = 1; // * base volume

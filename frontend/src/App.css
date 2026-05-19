@@ -52,3 +52,8 @@ button:hover {
 strong {
   color: #646cff;
 }
+
+.status {
+  color: #054d12;
+  scale: 1.2;
+}

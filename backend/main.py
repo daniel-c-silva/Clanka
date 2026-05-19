@@ -108,7 +108,6 @@ def conversation(context, userMessage):
 
 # ! Emotions Helper Function
 def getEmotions(userMessage):
-    def getEmotions(userMessage):
     prompt = f"You are Clanka, a friendly and playful AI robot. A user just said this to you: '{userMessage}'. Reply with ONE single word only, no punctuation, no explanation. Choose from ONLY these options: happy, sad, angry, neutral, excited, scared, confused, frustrated, surprised."
     response = client.chat.complete(
         model="mistral-tiny", # * cheaper and faster model, enough for emotion detection

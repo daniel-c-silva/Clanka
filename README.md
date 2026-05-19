@@ -44,10 +44,6 @@ Calculations were performed to ensure motors could withstand the load.
 
 [https://clanka-eight.vercel.app](https://clanka-eight.vercel.app)
 
-a bit slow sometimes on start but once it runs it runs
-
-# *******(to be fixed soon)
-
 ## Tech Stack
 
 ```

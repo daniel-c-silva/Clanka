@@ -99,5 +99,12 @@ npm run dev
 
 
 
+# TODO:
+- ** animate emotions **
+- ** program a wake up word **
+- ** assamble the robot **
+
+
+
 
 

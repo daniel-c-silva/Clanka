@@ -2,8 +2,7 @@
 
 ![Motors Simulation](assets/motors-simulation.gif)
 
-## robot friend, still in the begining of the begginings but Clanka is supposed to be an ai friend powered by Mistral AI that portrais emotions, that you can control remotely and eventually be automatic.
-
+## robot friend, still in the begining of the begginings but Clanka is supposed to be an ai friend powered by Groq that portrays emotions, that you can control remotely and eventually be automatic.
 
 ## Hardware & Engineering
 Clanka is built on a custom-designed chassis with mechanical tolerances.

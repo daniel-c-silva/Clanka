@@ -1,7 +1,6 @@
 from flask import Flask, request, jsonify
 import flask
-from mistralai.client import Mistral
-from mistralai.client.errors import SDKError  # * Import SDKError to catch rate limits
+from groq import Groq
 from flask_cors import CORS
 import psycopg2 
 import os
@@ -33,7 +32,7 @@ CORS(app)
 
 # * mistral setup
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY") # * mistral key from .env
-client = Mistral(api_key=MISTRAL_API_KEY)
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
 # ! --- HELPER FUNCTIONS
@@ -86,9 +85,9 @@ def getAnswerAndEmotion(context, userMessage):
     [RESPONSE] <your chat response>"""
     
     try:
-        response = client.chat.complete(
-            model="mistral-small-latest",
-            messages=[{"role": "user", "content": prompt}],
+        response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[{"role": "user", "content": prompt}],
         )
         raw_text = response.choices[0].message.content.strip()
         

@@ -1,7 +1,5 @@
 flask
 flask-cors
-mistralai
 psycopg2-binary
+groq
 python-dotenv
-pyserial
-gunicorn

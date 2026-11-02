@@ -62,14 +62,13 @@ Calculations were performed to ensure motors could withstand the load.
 pip install -r requirements.txt
 ```
 
-## Mistral API key
+## Groq API key
 ```
-Go to console.mistral.ai
+Go to console.groq.com
 Sign up or log in
-Go to API Keys in the sidebar
-Click Create new key, give it a name
-Copy it — cuz you won't see it again
-Paste it in your .env file:
+Click Create API Key and give it a name
+Copy it — 'cause you won't see it again
+Paste it in your .env file as GROQ_API_KEY (or add it to your Render Environment Variables):
 ```
 
 ## PostgresSQL set up

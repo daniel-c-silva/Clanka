@@ -1,14 +1,12 @@
 from flask import Flask, request, jsonify
 import flask
-from groq import Groq
+from groq import Groq, APIStatusError  # * Imported Groq and APIStatusError
 from flask_cors import CORS
 import psycopg2 
 import os
 from dotenv import load_dotenv  
 
 # !---SETUP
-
-
 load_dotenv() # * load variables from .env file
 
 # * postgres setup
@@ -30,8 +28,7 @@ conn.close()
 app = Flask(__name__) # * the app using it to create routes and stuff
 CORS(app)
 
-# * mistral setup
-MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY") # * mistral key from .env
+# * Groq setup
 client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 
@@ -86,8 +83,8 @@ def getAnswerAndEmotion(context, userMessage):
     
     try:
         response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
+            model="llama-3.3-70b-versatile",
+            messages=[{"role": "user", "content": prompt}],
         )
         raw_text = response.choices[0].message.content.strip()
         
@@ -106,11 +103,14 @@ def getAnswerAndEmotion(context, userMessage):
                 
         return answer, emotion
         
-    except SDKError as e:
+    except APIStatusError as e:
         if e.status_code == 429:
             # Fallback response if rate limit is hit
             return "Whoa, slow down! My robotic brain is getting overloaded with too many messages right now.", "confused"
         raise e
+    except Exception as e:
+        # Catch-all fallback for any other unexpected errors
+        return "Oops, my circuits blinked for a second! What did you say?", "confused"
 
 
 # ! store in db Helper function

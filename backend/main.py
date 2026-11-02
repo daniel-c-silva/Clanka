@@ -1,8 +1,9 @@
 from flask import Flask, request, jsonify
 import flask
 from mistralai.client import Mistral
+from mistralai.client.errors import SDKError  # * Import SDKError to catch rate limits
 from flask_cors import CORS
-import psycopg2 # * import postgres sql
+import psycopg2 
 import os
 from dotenv import load_dotenv  
 
@@ -13,16 +14,9 @@ load_dotenv() # * load variables from .env file
 
 # * postgres setup
 conn = psycopg2.connect(os.getenv("DATABASE_URL"))
-
-
 cursor = conn.cursor()
 
-
-
 # * create table if not exists for storing convo.
-
- 
-
 cursor.execute('''CREATE TABLE IF NOT EXISTS memory (
     id SERIAL PRIMARY KEY,
     session_id TEXT NOT NULL, 
@@ -33,35 +27,22 @@ conn.commit()
 cursor.close()
 conn.close()
 
-
-
-
 # * flask setup
-
-
 app = Flask(__name__) # * the app using it to create routes and stuff
 CORS(app)
 
-
-
 # * mistral setup
-
-
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY") # * mistral key from .env
 client = Mistral(api_key=MISTRAL_API_KEY)
 
 
-
-
 # ! --- HELPER FUNCTIONS
-
 
 
 # ! Helper function to simplify the connection and cursor definition
 def getDB():
     conn = psycopg2.connect(os.getenv("DATABASE_URL"))
     return conn, conn.cursor()
-
 
 
 # ! context helper function
@@ -83,9 +64,8 @@ def getContext(session_id):
     return context
 
 
-
-# ! Conversation Helper function
-def conversation(context, userMessage):
+# ! Combine Conversation & Emotion Helper function for api rate limits
+def getAnswerAndEmotion(context, userMessage):
     prompt = f"""You are Clanka, an AI robot friend. Helpful, a little childish and playful, but you talk like a normal person in a casual conversation.
     STRICT Rules you must NEVER break:
     - NEVER use asterisks or actions like *dances* or *eyes light up* or *giggles*
@@ -96,25 +76,42 @@ def conversation(context, userMessage):
     - Just talk like a friend texting back, plain words only
     Previous conversation (for context only, focus on the latest message):
     {context}
-    Latest message (answer THIS): {userMessage}"""
+    Latest message (answer THIS): {userMessage}
+
+    Task: Provide both your chat response and your current emotion based on the user's message.
+    Choose the emotion from ONLY these options: happy, sad, angry, neutral, excited, scared, confused, frustrated, surprised.
     
-    response = client.chat.complete(
-        model = "mistral-small-latest",
-        messages = [{"role": "user", "content": prompt}],
-    )
-    return response.choices[0].message.content # * choices[0] is the first response, message.content is the content of the response
-
-
-
-# ! Emotions Helper Function
-def getEmotions(userMessage):
-    prompt = f"You are Clanka, a friendly and playful AI robot. A user just said this to you: '{userMessage}'. Reply with ONE single word only, no punctuation, no explanation. Choose from ONLY these options: happy, sad, angry, neutral, excited, scared, confused, frustrated, surprised."
-    response = client.chat.complete(
-        model="mistral-tiny", # * cheaper and faster model, enough for emotion detection
-        messages=[{"role": "user", "content": prompt}],
-    )
-    return response.choices[0].message.content
-
+    Format your exact output like this (nothing else):
+    [EMOTION] <chosen_emotion>
+    [RESPONSE] <your chat response>"""
+    
+    try:
+        response = client.chat.complete(
+            model="mistral-small-latest",
+            messages=[{"role": "user", "content": prompt}],
+        )
+        raw_text = response.choices[0].message.content.strip()
+        
+        emotion = "neutral"
+        answer = raw_text
+        
+        # Parse the structured response
+        if "[EMOTION]" in raw_text and "[RESPONSE]" in raw_text:
+            parts = raw_text.split("[RESPONSE]")
+            emotion_part = parts[0].replace("[EMOTION]", "").strip().lower()
+            answer = parts[1].strip()
+            
+            valid_emotions = {"happy", "sad", "angry", "neutral", "excited", "scared", "confused", "frustrated", "surprised"}
+            if emotion_part in valid_emotions:
+                emotion = emotion_part
+                
+        return answer, emotion
+        
+    except SDKError as e:
+        if e.status_code == 429:
+            # Fallback response if rate limit is hit
+            return "Whoa, slow down! My robotic brain is getting overloaded with too many messages right now.", "confused"
+        raise e
 
 
 # ! store in db Helper function
@@ -135,11 +132,10 @@ def storeInDb(userMessage, botResponse, session_id):
     conn.close()
 
 
-    # ! generate response Helper function
+# ! generate response Helper function
 def generate_response(userMessage, session_id): # * get all serves to get the answer and the emotion
     context = getContext(session_id) # * get the context for the session id 
-    answer = conversation(context, userMessage)
-    emotion = getEmotions(userMessage)
+    answer, emotion = getAnswerAndEmotion(context, userMessage) # * 1 API call for both!
     storeInDb(userMessage, answer, session_id) # * store the convo in the database.
     return jsonify({
         "answer": answer,
@@ -165,10 +161,14 @@ def home():
 # ! chat endpoint
 def chatEndpoint(): # * chat endpoint serves to get the message from the user
     data = request.json # * get the data from the request. the userMessage basically
+    if not data:
+        return jsonify({"error": "No JSON data provided"}), 400
+        
     user_message = data.get("message") # * get the message from the data
     session_id = data.get("session_id") # * get the session id from the data
     if not user_message: # ? if the message is not found
-        return jsonify({"error": "User message was not found"})
+        return jsonify({"error": "User message was not found"}), 400
+        
     result = generate_response(user_message, session_id) # * get the result from the getAll function
     return result
 
